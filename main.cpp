@@ -7,7 +7,11 @@ using std::cin;
 using std::endl;
 
 //
-constexpr int SCREEN_WIDTH = 700;
+
+const unsigned delay_ms = 50;
+
+//
+constexpr int SCREEN_WIDTH = 714;
 constexpr int SCREEN_HEIGHT = SCREEN_WIDTH;
 
 constexpr int GRID_SIZE = 51;
@@ -24,7 +28,7 @@ unsigned light_map_buffer[map_side_size][map_side_size] = {};
 bool solid_map[map_side_size][map_side_size] = {};
 
 //
-float RENDER_BRIGHTNESS_FACTOR = 600;
+float RENDER_BRIGHTNESS_FACTOR = 1000;
 
 //
 unsigned summ_start = 0;
@@ -53,165 +57,99 @@ void draw_cells(SDL_Renderer* renderer) {
 	}	
 }
 
-void lightPhysics() {
-	//Settings
-	const unsigned ITERATION_AMOUNT = 1;
+int get_i_cycle_array(int i) {
+	if (i < 0) {
+		//return map_side_size - 1;
+		return 25;
+	}
+	if (i >= map_side_size) {
+		//return 0;
+		return 25;
+	}
+	return i;
+}
+int get_j_cycle_array(int j) {
+	if (j < 0) {
+		//return map_side_size - 1;
+		return 25;
+	}
+	if (j >= map_side_size) {
+		//return 0;
+		return 25;
+	}
+	return j;
+}
 
-	//light_map declar
-	/*const int map_side_size = 16;
-
-	unsigned light_map[map_side_size][map_side_size] = {};
-	unsigned light_map_buffer[map_side_size][map_side_size] = {};
-
-	bool solid_map[map_side_size][map_side_size] = {};*/
-
-	////Set light on light_map
-	////light_map[8][6] = 256;
-	////light_map[7][10] = 256;
-	//light_map[50][50] = 5;
-	////light_map[70][50] = 100;
-
-	////Set Solid on solid light_map
-	//solid_map[7][8] = true;
-	//solid_map[6][8] = true;
-	//solid_map[6][9] = true;
-	//solid_map[6][10] = true;
-	//solid_map[6][11] = true;
-	//solid_map[6][12] = true;
-	//solid_map[7][11] = true;
-	//solid_map[8][11] = true;
-
-	////Summ of all cells value
-	//unsigned summ_start = 0;
-	//for (const auto& row : light_map)
-	//{
-	//	for (const auto& col : row)
-	//	{
-	//		summ_start += col;
-	//	}
-	//}
-
-	// Main
-	for (unsigned iter = 0; iter < ITERATION_AMOUNT; ++iter)
+void energy_physics() {
+	//Light wave one iter
+	for (int i = 0; i < map_side_size; ++i)
 	{
-		////Draw
-		//for (auto i = 0; i < map_side_size; ++i)
-		//{
-		//	for (auto j = 0; j < map_side_size; ++j)
-		//	{
-		//		if (!solid_map[i][j]) {
-		//			if (light_map[i][j] == 0)
-		//			{
-		//				cout << "___";
-		//			}
-		//			else
-		//			{
-
-		//				if (light_map[i][j] < 100)
-		//				{
-		//					cout << "0";
-		//				}
-		//				if (light_map[i][j] < 10)
-		//				{
-		//					cout << "0";
-		//				}
-		//				cout << light_map[i][j];
-
-		//			}
-		//		}
-		//		else
-		//		{
-		//			cout << "###";
-		//		}
-		//		cout << " ";
-		//	}
-		//	cout << endl << endl;
-		//}
-		//cout << endl << endl << endl;
-
-		//Light wave one iter
-		for (auto i = 0; i < map_side_size; ++i)
+		for (int j = 0; j < map_side_size; ++j)
 		{
-			for (auto j = 0; j < map_side_size; ++j)
+			//if (i > 0 && j > 0 && i < map_side_size - 1 && j < map_side_size - 1)
 			{
-				if (i > 0 && j > 0 && i < map_side_size - 1 && j < map_side_size - 1)
+				unsigned divided_value = light_map[i][j] / 5;
+
+				if (!solid_map[get_i_cycle_array(i - 1)][j])
 				{
-					//if (!solid_map[i][j])
-					{
-						//if (light_map[i][j] > 0)
-						{
-							//if (light_map[i][j] / 5 > 0)
-							{
-								unsigned divided_value = light_map[i][j] / 5;
-
-								if (!solid_map[i - 1][j])
-								{
-									light_map_buffer[i - 1][j] += divided_value;
-								}
-								else
-								{
-									light_map_buffer[i][j] += divided_value;
-								}
-
-								if (!solid_map[i + 1][j])
-								{
-									light_map_buffer[i + 1][j] += divided_value;
-								}
-								else
-								{
-									light_map_buffer[i][j] += divided_value;
-								}
-
-								if (!solid_map[i][j - 1])
-								{
-									light_map_buffer[i][j - 1] += divided_value;
-								}
-								else
-								{
-									light_map_buffer[i][j] += divided_value;
-								}
-
-								if (!solid_map[i][j + 1])
-								{
-									light_map_buffer[i][j + 1] += divided_value;
-								}
-								else
-								{
-									light_map_buffer[i][j] += divided_value;
-								}
-
-								//
-								light_map_buffer[i][j] += divided_value;
-
-								//
-								light_map_buffer[i][j] += light_map[i][j] % 5;
-							}
-							// else
-							// {
-							//     light_map_buffer[i][j] += light_map[i][j];
-							// }
-						}
-					}
+					light_map_buffer[get_i_cycle_array(i - 1)][j] += divided_value;
 				}
+				else
+				{
+					light_map_buffer[i][j] += divided_value;
+				}
+
+				if (!solid_map[get_i_cycle_array(i + 1)][j])
+				{
+					light_map_buffer[get_i_cycle_array(i + 1)][j] += divided_value;
+				}
+				else
+				{
+					light_map_buffer[i][j] += divided_value;
+				}
+
+				if (!solid_map[i][get_j_cycle_array(j - 1)])
+				{
+					light_map_buffer[i][get_j_cycle_array(j - 1)] += divided_value;
+				}
+				else
+				{
+					light_map_buffer[i][j] += divided_value;
+				}
+
+				if (!solid_map[i][get_j_cycle_array(j + 1)])
+				{
+					light_map_buffer[i][get_j_cycle_array(j + 1)] += divided_value;
+				}
+				else
+				{
+					light_map_buffer[i][j] += divided_value;
+				}
+
+				//
+				light_map_buffer[i][j] += divided_value;
+
+				//
+				light_map_buffer[i][j] += light_map[i][j] % 5;
 			}
 		}
+	}
 
-		// Copy light_map_buffer to light_map and clear
-		for (auto i = 0; i < map_side_size; ++i)
+	// Copy light_map_buffer to light_map and clear
+	for (int i = 0; i < map_side_size; ++i)
+	{
+		for (int j = 0; j < map_side_size; ++j)
 		{
-			for (auto j = 0; j < map_side_size; ++j)
+			//if (i > 0 && j > 0 && i < map_side_size - 1 && j < map_side_size - 1)
 			{
-				if (i > 0 && j > 0 && i < map_side_size - 1 && j < map_side_size - 1)
-				{
-					light_map[i][j] = light_map_buffer[i][j];
-					light_map_buffer[i][j] = 0;
-				}
+				light_map[i][j] = light_map_buffer[i][j];
+				light_map_buffer[i][j] = 0;
 			}
 		}
 	}
 
 	////// Test (Lost Value To Center)
-	unsigned summ_finish = 0;
+	/*unsigned summ_finish = 0;
 	for (const auto& row : light_map)
 	{
 		for (const auto& col : row)
@@ -219,11 +157,11 @@ void lightPhysics() {
 			summ_finish += col;
 		}
 	}	
-	light_map[25][25] += summ_start - summ_finish;
+	light_map[25][25] += summ_start - summ_finish;*/
 	////////////
 
 	//Summ of all cells value
-	summ_finish = 0;
+	unsigned summ_finish = 0;
 	for (const auto& row : light_map)
 	{
 		for (const auto& col : row)
@@ -238,17 +176,48 @@ void lightPhysics() {
 		//cout << "Finish summ of all cells value: " << summ_finish << endl;
 	}
 	//Value lost
-	cout << "Value lost: " << summ_start - summ_finish << endl;
+	cout << "Value lost: " << summ_start - summ_finish << endl;	
+}
 
+void draw_grid(bool is_on, SDL_Renderer* renderer) {
+	if (is_on) {
+		SDL_SetRenderDrawColor(renderer, 30, 30, 30, SDL_ALPHA_OPAQUE);
+		for (int w = -1; w <= SCREEN_WIDTH; w += GRID_SHIFT) {
+			SDL_RenderDrawLine(renderer, w, 0, w, SCREEN_HEIGHT);
+			SDL_RenderDrawLine(renderer, w + 1, 0, w + 1, SCREEN_HEIGHT);
+		}
+		for (int h = -1; h <= SCREEN_HEIGHT; h += GRID_SHIFT) {
+			SDL_RenderDrawLine(renderer, 0, h, SCREEN_WIDTH, h);
+			SDL_RenderDrawLine(renderer, 0, h + 1, SCREEN_WIDTH, h + 1);
+		}
+	}	
+}
 
-	
+void draw_test_cells(bool is_on, SDL_Renderer* renderer) {
+	if (is_on) {
+		SDL_SetRenderDrawColor(renderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
+		SDL_Rect cells[GRID_SIZE][GRID_SIZE];
+		for (int i = 0; i < GRID_SIZE; ++i) {
+			for (int j = 0; j < GRID_SIZE; ++j) {
+				if (i == j)
+				{
+					SDL_Rect rect{ i * GRID_SHIFT, j * GRID_SHIFT, GRID_SHIFT, GRID_SHIFT };
+					SDL_RenderFillRect(renderer, &rect);
+				}
+
+			}
+		}
+	}	
 }
 
 int main(int argc, char* argv[]) {
 	//Set light on light_map
 	//light_map[8][6] = 256;
 	//light_map[7][10] = 256;
+	//light_map[24][24] = MAX_LIGHT_STRENGTH;
 	light_map[25][25] = MAX_LIGHT_STRENGTH;
+	//light_map[24][25] = MAX_LIGHT_STRENGTH;
+	//light_map[25][24] = MAX_LIGHT_STRENGTH;
 	//light_map[60][56] = MAX_LIGHT_STRENGTH / 5;
 	//light_map[70][80] = MAX_LIGHT_STRENGTH / 5;
 
@@ -338,44 +307,23 @@ int main(int argc, char* argv[]) {
 		//////////////////////////////////
 
 		//Physics
-		lightPhysics();
+		energy_physics();
 
 		//Draw
 		draw_cells(renderer);
 
-
-		//Draw Cells
-		/*SDL_SetRenderDrawColor(renderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
-		SDL_Rect cells[GRID_SIZE][GRID_SIZE];
-		for (int i = 0; i < SCREEN_WIDTH; i += GRID_SHIFT) {
-			for (int j = 0; j < SCREEN_HEIGHT; j += GRID_SHIFT) {
-				SDL_Rect rect{ i, j, i + GRID_SHIFT, j + GRID_SHIFT };
-				SDL_RenderFillRect(renderer, &rect);
-			}
-		}*/
-
-		// Draw Rect
-		//SDL_SetRenderDrawColor(renderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
-		//SDL_Rect rect{0, 0, GRID_SHIFT, GRID_SHIFT};
-		//SDL_RenderFillRect(renderer, &rect);
+		// Draw Test Cells
+		draw_test_cells(false, renderer);
 
 		// Draw Grid
-		/*SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-		for (int w = -1; w <= SCREEN_WIDTH; w += GRID_SHIFT) {
-			SDL_RenderDrawLine(renderer, w, 0, w, SCREEN_HEIGHT);
-			SDL_RenderDrawLine(renderer, w + 1, 0, w + 1, SCREEN_HEIGHT);
-		}
-		for (int h = -1; h <= SCREEN_HEIGHT; h += GRID_SHIFT) {
-			SDL_RenderDrawLine(renderer, 0, h, SCREEN_WIDTH, h);
-			SDL_RenderDrawLine(renderer, 0, h + 1, SCREEN_WIDTH, h + 1);
-		}*/
+		draw_grid(true, renderer);
 
 		//////////////////////////////////
 				
 		// Finally show what we've drawn
 		SDL_RenderPresent(renderer);
 
-		SDL_Delay(50);
+		SDL_Delay(delay_ms);
 	}
 
 	// We destroy our window. We are passing in the pointer
