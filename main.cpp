@@ -8,7 +8,7 @@ using std::endl;
 
 //
 
-const unsigned delay_ms = 5;
+unsigned DELAY_MS = 5;
 
 //
 constexpr int SCREEN_WIDTH = 1005;
@@ -38,6 +38,7 @@ bool is_set_solid = false;
 bool is_remove_solid = false;
 bool is_pause = true;
 bool is_next_state = false;
+bool is_draw_grid = true;
 
 int clamp(int value, const int min, const int max) {
 	if (value < min)
@@ -349,6 +350,14 @@ int main(int argc, char* argv[]) {
 						cin >> RENDER_BRIGHTNESS_FACTOR;
 						cout << endl;
 						break;
+					case SDLK_d:  // Set Delay
+						cout << "Enter Delay (ms): ";
+						cin >> DELAY_MS;
+						cout << endl;
+						break;
+					case SDLK_g:  // Draw Grid
+						is_draw_grid = !is_draw_grid;
+						break;
 					default:
 						break;
 					}
@@ -439,14 +448,14 @@ int main(int argc, char* argv[]) {
 		draw_test_cells(false, renderer);
 
 		// Draw Grid
-		draw_grid(true, renderer);
+		draw_grid(is_draw_grid, renderer);
 
 		//////////////////////////////////
 				
 		// Finally show what we've drawn
 		SDL_RenderPresent(renderer);
 
-		SDL_Delay(delay_ms);
+		SDL_Delay(DELAY_MS);
 
 		/// Test
 		

@@ -1,6 +1,6 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (VoxelPhysics.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   main.cpp
-F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(68,86): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(225,37): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(227,12): warning C4101: 'cells': unreferenced local variable
+F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(69,86): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(226,37): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\main.cpp(228,12): warning C4101: 'cells': unreferenced local variable
   VoxelPhysics.vcxproj -> F:\1_Project\3_Studio\Games\VoxelWorld\Code\EnergyPhysics\x64\Debug\EnergyPhysics.exe
