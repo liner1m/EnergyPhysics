@@ -11,14 +11,14 @@ using std::endl;
 const unsigned delay_ms = 5;
 
 //
-constexpr int SCREEN_WIDTH = 737;
+constexpr int SCREEN_WIDTH = 1005;
 constexpr int SCREEN_HEIGHT = SCREEN_WIDTH;
 
-constexpr int GRID_SIZE = 67;
+constexpr int GRID_SIZE = 201;
 constexpr int GRID_SHIFT = SCREEN_WIDTH / GRID_SIZE;
 
 //
-const unsigned MAX_LIGHT_STRENGTH = 1000;
+const unsigned MAX_LIGHT_STRENGTH = 100000;
 
 const int map_side_size = GRID_SIZE;
 
@@ -55,13 +55,18 @@ void draw_cells(SDL_Renderer* renderer) {
 	SDL_Rect rect;
 	for (int i = 0; i < GRID_SIZE; ++i) {
 		for (int j = 0; j < GRID_SIZE; ++j) {
-			if (light_map[i][j] || solid_map[i][j]) {
-				if (light_map[i][j]) {
-					unsigned light_to_rgb = clamp(float(light_map[i][j]) / MAX_LIGHT_STRENGTH * 255 * RENDER_BRIGHTNESS_FACTOR, 0, 255);
-					SDL_SetRenderDrawColor(renderer, light_to_rgb, light_to_rgb, 0, SDL_ALPHA_OPAQUE);
-				}
+			//if (light_map[i][j] || solid_map[i][j]) {
+				//if (light_map[i][j]) {
+					//unsigned light_to_rgb = clamp(float(light_map[i][j]) / MAX_LIGHT_STRENGTH * 255 * RENDER_BRIGHTNESS_FACTOR, 0, 255);
+					//SDL_SetRenderDrawColor(renderer, light_to_rgb, light_to_rgb, 0, SDL_ALPHA_OPAQUE);
+				//}
 				if (solid_map[i][j]) {
 					SDL_SetRenderDrawColor(renderer, 100, 100, 100, SDL_ALPHA_OPAQUE);
+				}
+				else 
+				{
+					unsigned light_to_rgb = clamp(float(light_map[i][j]) / MAX_LIGHT_STRENGTH * 255 * RENDER_BRIGHTNESS_FACTOR, 0, 255);
+					SDL_SetRenderDrawColor(renderer, light_to_rgb, light_to_rgb, 0, SDL_ALPHA_OPAQUE);
 				}
 
 				rect.x = i * GRID_SHIFT;
@@ -70,7 +75,7 @@ void draw_cells(SDL_Renderer* renderer) {
 				rect.h = GRID_SHIFT;
 
 				SDL_RenderFillRect(renderer, &rect);
-			}			
+			//}			
 		}
 	}	
 }
@@ -79,10 +84,12 @@ int get_i_cycle_array(int i) {
 	if (i < 0) {
 		//return map_side_size - 1;
 		return map_side_size / 2;
+		//return 0;
 	}
 	if (i >= map_side_size) {
 		//return 0;
 		return map_side_size / 2;
+		//return map_side_size - 1;
 	}
 	return i;
 }
@@ -90,10 +97,12 @@ int get_j_cycle_array(int j) {
 	if (j < 0) {
 		//return map_side_size - 1;
 		return map_side_size / 2;
+		//return 0;
 	}
 	if (j >= map_side_size) {
 		//return 0;
 		return map_side_size / 2;
+		//return map_side_size - 1;
 	}
 	return j;
 }
@@ -266,12 +275,12 @@ int main(int argc, char* argv[]) {
 	//solid_map[42][50] = true;
 	//solid_map[43][50] = true;
 
-	for (unsigned int i = 0; i < GRID_SIZE; ++i)
+	/*for (unsigned int i = 0; i < GRID_SIZE; ++i)
 	{
 		solid_map[i][50] = true;
 	}
 	solid_map[43][50] = false;
-	solid_map[44][50] = false;
+	solid_map[44][50] = false;*/
 
 	//////////////////////////
 
