@@ -8,17 +8,17 @@ using std::endl;
 
 //
 
-const unsigned delay_ms = 50;
+const unsigned delay_ms = 5;
 
 //
-constexpr int SCREEN_WIDTH = 714;
+constexpr int SCREEN_WIDTH = 1005;
 constexpr int SCREEN_HEIGHT = SCREEN_WIDTH;
 
-constexpr int GRID_SIZE = 51;
+constexpr int GRID_SIZE = 67;
 constexpr int GRID_SHIFT = SCREEN_WIDTH / GRID_SIZE;
 
 //
-const unsigned MAX_LIGHT_STRENGTH = 10000;
+const unsigned MAX_LIGHT_STRENGTH = 20000;
 
 const int map_side_size = GRID_SIZE;
 
@@ -28,10 +28,22 @@ unsigned light_map_buffer[map_side_size][map_side_size] = {};
 bool solid_map[map_side_size][map_side_size] = {};
 
 //
-float RENDER_BRIGHTNESS_FACTOR = 1000;
+float RENDER_BRIGHTNESS_FACTOR = 500;
 
 //
 unsigned summ_start = 0;
+
+int clamp(int value, const int min, const int max) {
+	if (value < min)
+	{
+		return min;
+	}
+	if (value > max)
+	{
+		return max;
+	}
+	return value;
+}
 
 void draw_cells(SDL_Renderer* renderer) {
 	SDL_Rect rect;
@@ -39,7 +51,7 @@ void draw_cells(SDL_Renderer* renderer) {
 		for (int j = 0; j < GRID_SIZE; ++j) {
 			if (light_map[i][j] || solid_map[i][j]) {
 				if (light_map[i][j]) {
-					unsigned light_to_rgb = float(light_map[i][j]) / MAX_LIGHT_STRENGTH * 255 * RENDER_BRIGHTNESS_FACTOR;
+					unsigned light_to_rgb = clamp(float(light_map[i][j]) / MAX_LIGHT_STRENGTH * 255 * RENDER_BRIGHTNESS_FACTOR, 0, 255);
 					SDL_SetRenderDrawColor(renderer, light_to_rgb, light_to_rgb, 0, SDL_ALPHA_OPAQUE);
 				}
 				if (solid_map[i][j]) {
@@ -60,22 +72,22 @@ void draw_cells(SDL_Renderer* renderer) {
 int get_i_cycle_array(int i) {
 	if (i < 0) {
 		//return map_side_size - 1;
-		return 25;
+		return map_side_size / 2;;
 	}
 	if (i >= map_side_size) {
 		//return 0;
-		return 25;
+		return map_side_size / 2;;
 	}
 	return i;
 }
 int get_j_cycle_array(int j) {
 	if (j < 0) {
 		//return map_side_size - 1;
-		return 25;
+		return map_side_size / 2;
 	}
 	if (j >= map_side_size) {
 		//return 0;
-		return 25;
+		return map_side_size / 2;
 	}
 	return j;
 }
@@ -175,8 +187,8 @@ void energy_physics() {
 		//cout << "Finish summ of all cells value: " << summ_start << endl;
 		//cout << "Finish summ of all cells value: " << summ_finish << endl;
 	}
-	//Value lost
-	cout << "Value lost: " << summ_start - summ_finish << endl;	
+	//Energy lost
+	cout << "Energy lost: " << summ_start - summ_finish << endl;
 }
 
 void draw_grid(bool is_on, SDL_Renderer* renderer) {
@@ -195,7 +207,8 @@ void draw_grid(bool is_on, SDL_Renderer* renderer) {
 
 void draw_test_cells(bool is_on, SDL_Renderer* renderer) {
 	if (is_on) {
-		SDL_SetRenderDrawColor(renderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
+		unsigned light_to_rgb = clamp(255 * RENDER_BRIGHTNESS_FACTOR, 0, 255);
+		SDL_SetRenderDrawColor(renderer, light_to_rgb, light_to_rgb, light_to_rgb, SDL_ALPHA_OPAQUE);
 		SDL_Rect cells[GRID_SIZE][GRID_SIZE];
 		for (int i = 0; i < GRID_SIZE; ++i) {
 			for (int j = 0; j < GRID_SIZE; ++j) {
@@ -215,37 +228,43 @@ int main(int argc, char* argv[]) {
 	//light_map[8][6] = 256;
 	//light_map[7][10] = 256;
 	//light_map[24][24] = MAX_LIGHT_STRENGTH;
-	light_map[25][25] = MAX_LIGHT_STRENGTH;
+	light_map[map_side_size / 2][map_side_size / 2] = MAX_LIGHT_STRENGTH;
 	//light_map[24][25] = MAX_LIGHT_STRENGTH;
 	//light_map[25][24] = MAX_LIGHT_STRENGTH;
 	//light_map[60][56] = MAX_LIGHT_STRENGTH / 5;
 	//light_map[70][80] = MAX_LIGHT_STRENGTH / 5;
 
 	//Set Solid on solid light_map
-	/*solid_map[50][60] = true;
-	solid_map[51][60] = true;
-	solid_map[52][60] = true;
-	solid_map[53][60] = true;
-	solid_map[54][60] = true;
-	solid_map[55][60] = true;
-	solid_map[56][60] = true;
-	solid_map[57][60] = true;
-	solid_map[58][60] = true;
-	solid_map[59][60] = true;
-	solid_map[60][60] = true;
-	solid_map[61][60] = true;
-	solid_map[62][60] = true;
-	solid_map[63][60] = true;
-	solid_map[64][60] = true;
-	solid_map[65][60] = true;
-	solid_map[66][60] = true;
-	solid_map[67][60] = true;
-	solid_map[68][60] = true;
-	solid_map[69][60] = true;
-	solid_map[70][60] = true;
-	solid_map[71][60] = true;
-	solid_map[72][60] = true;
-	solid_map[73][60] = true;*/
+	//solid_map[20][50] = true;
+	//solid_map[21][50] = true;
+	//solid_map[22][50] = true;
+	//solid_map[23][50] = true;
+	//solid_map[24][50] = true;
+	//solid_map[25][50] = true;
+	//solid_map[26][50] = true;
+	//solid_map[27][50] = true;
+	//solid_map[28][50] = true;
+	//solid_map[29][50] = true;
+	//solid_map[30][50] = true;
+	////solid_map[31][50] = true;
+	//solid_map[32][50] = true;
+	//solid_map[33][50] = true;
+	//solid_map[34][50] = true;
+	//solid_map[35][50] = true;
+	//solid_map[36][50] = true;
+	//solid_map[37][50] = true;
+	//solid_map[38][50] = true;
+	//solid_map[39][50] = true;
+	//solid_map[40][50] = true;
+	//solid_map[41][50] = true;
+	//solid_map[42][50] = true;
+	//solid_map[43][50] = true;
+
+	for (unsigned int i = 0; i < GRID_SIZE; ++i)
+	{
+		solid_map[i][50] = true;
+	}
+	solid_map[33][50] = false;
 
 	//////////////////////////
 
@@ -296,6 +315,31 @@ int main(int argc, char* argv[]) {
 			if (event.type == SDL_QUIT) {
 				gameIsRunning = false;
 			}
+			else
+			{
+				if (event.type == SDL_KEYDOWN) {
+					switch (event.key.keysym.sym)
+					{
+					case SDLK_b:
+						cout << "Enter brightness: ";
+						cin >> RENDER_BRIGHTNESS_FACTOR;
+						cout << endl;
+						break;
+					default:
+						break;
+					}
+				}
+				if (event.type == SDL_MOUSEWHEEL) {
+					if (event.wheel.y > 0) {
+						RENDER_BRIGHTNESS_FACTOR += 100;
+						cout << "Brightness Factor: " << RENDER_BRIGHTNESS_FACTOR << endl;
+					}
+					if (event.wheel.y < 0) {
+						RENDER_BRIGHTNESS_FACTOR -= 100;
+						cout << "Brightness Factor: " << RENDER_BRIGHTNESS_FACTOR << endl;
+					}
+				}
+			}			
 		}
 		// (2) Handle Updates
 
@@ -324,6 +368,9 @@ int main(int argc, char* argv[]) {
 		SDL_RenderPresent(renderer);
 
 		SDL_Delay(delay_ms);
+
+		/// Test
+		
 	}
 
 	// We destroy our window. We are passing in the pointer
