@@ -11,14 +11,14 @@ using std::endl;
 const unsigned delay_ms = 5;
 
 //
-constexpr int SCREEN_WIDTH = 1005;
+constexpr int SCREEN_WIDTH = 737;
 constexpr int SCREEN_HEIGHT = SCREEN_WIDTH;
 
 constexpr int GRID_SIZE = 67;
 constexpr int GRID_SHIFT = SCREEN_WIDTH / GRID_SIZE;
 
 //
-const unsigned MAX_LIGHT_STRENGTH = 20000;
+const unsigned MAX_LIGHT_STRENGTH = 1000;
 
 const int map_side_size = GRID_SIZE;
 
@@ -32,6 +32,12 @@ float RENDER_BRIGHTNESS_FACTOR = 500;
 
 //
 unsigned summ_start = 0;
+
+//
+bool is_set_solid = false;
+bool is_remove_solid = false;
+bool is_pause = true;
+bool is_next_state = false;
 
 int clamp(int value, const int min, const int max) {
 	if (value < min)
@@ -72,11 +78,11 @@ void draw_cells(SDL_Renderer* renderer) {
 int get_i_cycle_array(int i) {
 	if (i < 0) {
 		//return map_side_size - 1;
-		return map_side_size / 2;;
+		return map_side_size / 2;
 	}
 	if (i >= map_side_size) {
 		//return 0;
-		return map_side_size / 2;;
+		return map_side_size / 2;
 	}
 	return i;
 }
@@ -264,7 +270,8 @@ int main(int argc, char* argv[]) {
 	{
 		solid_map[i][50] = true;
 	}
-	solid_map[33][50] = false;
+	solid_map[43][50] = false;
+	solid_map[44][50] = false;
 
 	//////////////////////////
 
@@ -310,6 +317,7 @@ int main(int argc, char* argv[]) {
 
 		// (1) Handle Input
 		// Start our event loop
+		
 		while (SDL_PollEvent(&event)) {
 			// Handle each specific event
 			if (event.type == SDL_QUIT) {
@@ -320,7 +328,14 @@ int main(int argc, char* argv[]) {
 				if (event.type == SDL_KEYDOWN) {
 					switch (event.key.keysym.sym)
 					{
-					case SDLK_b:
+					case SDLK_p:  // Pause
+						is_pause = !is_pause;
+						break;
+					case SDLK_RIGHT:  // Next State
+						is_pause = true;
+						is_next_state = true;
+						break;
+					case SDLK_b: // Set Brightness
 						cout << "Enter brightness: ";
 						cin >> RENDER_BRIGHTNESS_FACTOR;
 						cout << endl;
@@ -329,6 +344,8 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 				}
+
+				// Set Brightness by Mouse Wheel
 				if (event.type == SDL_MOUSEWHEEL) {
 					if (event.wheel.y > 0) {
 						RENDER_BRIGHTNESS_FACTOR += 100;
@@ -339,9 +356,51 @@ int main(int argc, char* argv[]) {
 						cout << "Brightness Factor: " << RENDER_BRIGHTNESS_FACTOR << endl;
 					}
 				}
+
+				// Mouse Button
+				if (event.type == SDL_MOUSEBUTTONDOWN) {					
+					switch (event.button.button)
+					{
+					case SDL_BUTTON_LEFT:
+						is_set_solid = true;
+						break;
+					case SDL_BUTTON_RIGHT:
+						is_remove_solid = true;
+						break;
+					default:
+						break;
+					}
+				}
+				if (event.type == SDL_MOUSEBUTTONUP) {
+					switch (event.button.button)
+					{
+					case SDL_BUTTON_LEFT:
+						is_set_solid = false;
+						break;
+					case SDL_BUTTON_RIGHT:
+						is_remove_solid = false;
+						break;
+					default:
+						break;
+					}
+				}				
 			}			
 		}
-		// (2) Handle Updates
+
+		// Set Solid by Mouse
+		if (is_set_solid)
+		{
+			int mouse_x, mouse_y;
+			SDL_GetMouseState(&mouse_x, &mouse_y);
+			solid_map[mouse_x / GRID_SHIFT][mouse_y / GRID_SHIFT] = true;
+		}
+		// Remove Solid by Mouse
+		if (is_remove_solid)
+		{
+			int mouse_x, mouse_y;
+			SDL_GetMouseState(&mouse_x, &mouse_y);
+			solid_map[mouse_x / GRID_SHIFT][mouse_y / GRID_SHIFT] = false;
+		}
 
 		// (3) Clear and Draw the Screen
 		// Gives us a clear "canvas"
@@ -351,7 +410,18 @@ int main(int argc, char* argv[]) {
 		//////////////////////////////////
 
 		//Physics
-		energy_physics();
+		if (!is_pause)
+		{
+			energy_physics();
+		}
+		else
+		{
+			if (is_next_state)
+			{
+				energy_physics();
+				is_next_state = false;
+			}
+		}
 
 		//Draw
 		draw_cells(renderer);
